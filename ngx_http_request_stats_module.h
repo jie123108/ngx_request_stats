@@ -9,19 +9,19 @@
 #include <ngx_http.h>
 #include <ngx_string.h>
 
-typedef struct ngx_http_request_status_op_s  ngx_http_request_status_op_t;
+typedef struct ngx_http_request_stats_op_s  ngx_http_request_stats_op_t;
 
-typedef u_char *(*ngx_http_request_status_op_run_pt) (ngx_http_request_t *r, u_char *buf,
-    ngx_http_request_status_op_t *op);
+typedef u_char *(*ngx_http_request_stats_op_run_pt) (ngx_http_request_t *r, u_char *buf,
+    ngx_http_request_stats_op_t *op);
 
-typedef size_t (*ngx_http_request_status_op_getlen_pt) (ngx_http_request_t *r,
+typedef size_t (*ngx_http_request_stats_op_getlen_pt) (ngx_http_request_t *r,
     uintptr_t data);
 
 
-struct ngx_http_request_status_op_s {
+struct ngx_http_request_stats_op_s {
     size_t                      len;
-    ngx_http_request_status_op_getlen_pt   getlen;
-    ngx_http_request_status_op_run_pt      run;
+    ngx_http_request_stats_op_getlen_pt   getlen;
+    ngx_http_request_stats_op_run_pt      run;
     uintptr_t                   data;
 };
 
@@ -29,32 +29,32 @@ struct ngx_http_request_status_op_s {
 typedef struct {
     ngx_str_t                   name;
     ngx_array_t                *flushes;
-    ngx_array_t                *ops;        /* array of ngx_http_request_status_op_t */
-} ngx_http_request_status_key_t;
+    ngx_array_t                *ops;        /* array of ngx_http_request_stats_op_t */
+} ngx_http_request_stats_key_t;
 
 
 typedef struct {
     ngx_array_t                *lengths;
     ngx_array_t                *values;
-} ngx_http_request_status_script_t;
+} ngx_http_request_stats_script_t;
 
 
 typedef struct {
 	//统计的名称，用于显示，查询。
-    ngx_str_t stat_name;
-    ngx_http_request_status_key_t       *key;
-	//ngx_http_request_status_value_t		*value;
-} ngx_http_request_status_t;
+    ngx_str_t stats_name;
+    ngx_http_request_stats_key_t       *key;
+	//ngx_http_request_stats_value_t		*value;
+} ngx_http_request_stats_t;
 
 typedef struct {
     ngx_str_t                   name;
     size_t                      len;
-    ngx_http_request_status_op_run_pt      run;
-	ngx_http_request_status_op_getlen_pt   getlen;
-} ngx_http_request_status_var_t;
+    ngx_http_request_stats_op_run_pt      run;
+	ngx_http_request_stats_op_getlen_pt   getlen;
+} ngx_http_request_stats_var_t;
 
 
-inline u_char *ngx_http_request_status_msec(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char *ngx_http_request_stats_msec(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
     ngx_time_t  *tp;
 
@@ -63,7 +63,7 @@ inline u_char *ngx_http_request_status_msec(ngx_http_request_t *r, u_char *buf, 
     return ngx_sprintf(buf, "%T.%03M", tp->sec, tp->msec);
 }
 
-inline int ngx_http_request_status_uri_parse(ngx_http_request_t *r,size_t* begin, size_t* end)
+inline int ngx_http_request_stats_uri_parse(ngx_http_request_t *r,size_t* begin, size_t* end)
 {
 	size_t len = 0;
 	size_t url_pos = 0;
@@ -109,14 +109,14 @@ inline int ngx_http_request_status_uri_parse(ngx_http_request_t *r,size_t* begin
 	return 0;
 }
 
-inline size_t ngx_http_request_status_uri_full_getlen(ngx_http_request_t *r, uintptr_t data)
+inline size_t ngx_http_request_stats_uri_full_getlen(ngx_http_request_t *r, uintptr_t data)
 {
 	if(r->request_line.len == 0){
 		return 1;
 	}	
 	size_t begin=0;
 	size_t end = 0;
-	int ret = ngx_http_request_status_uri_parse(r, &begin, &end);
+	int ret = ngx_http_request_stats_uri_parse(r, &begin, &end);
 	if(ret == -1){
 		return 1;
 	}	
@@ -124,7 +124,7 @@ inline size_t ngx_http_request_status_uri_full_getlen(ngx_http_request_t *r, uin
 }
 
 inline u_char *
-ngx_http_request_status_uri_full(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+ngx_http_request_stats_uri_full(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	if(r->request_line.len == 0){
 		return ngx_sprintf(buf, "-");
@@ -132,7 +132,7 @@ ngx_http_request_status_uri_full(ngx_http_request_t *r, u_char *buf, ngx_http_re
 	
 	size_t begin=0;
 	size_t end = 0;
-	int ret = ngx_http_request_status_uri_parse(r, &begin, &end);
+	int ret = ngx_http_request_stats_uri_parse(r, &begin, &end);
 	if(ret == -1){
 		return ngx_sprintf(buf, "-");
 	}	
@@ -143,8 +143,8 @@ ngx_http_request_status_uri_full(ngx_http_request_t *r, u_char *buf, ngx_http_re
 }
 
 inline u_char *
-ngx_http_request_status_request_time(ngx_http_request_t *r, u_char *buf,
-    ngx_http_request_status_op_t *op)
+ngx_http_request_stats_request_time(ngx_http_request_t *r, u_char *buf,
+    ngx_http_request_stats_op_t *op)
 {
     ngx_time_t      *tp;
     ngx_msec_int_t   ms;
@@ -160,7 +160,7 @@ ngx_http_request_status_request_time(ngx_http_request_t *r, u_char *buf,
 
 
 inline u_char *
-ngx_http_request_status_status(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+ngx_http_request_stats_status(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
     ngx_uint_t  status;
 
@@ -183,7 +183,7 @@ ngx_http_request_status_status(ngx_http_request_t *r, u_char *buf, ngx_http_requ
     return ngx_sprintf(buf, "%ui", status);
 }
 
-inline u_char* ngx_http_request_status_date(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_date(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_http_log_iso8601.data, 10);
 	//buf[4] = '-';
@@ -193,44 +193,44 @@ inline u_char* ngx_http_request_status_date(ngx_http_request_t *r, u_char *buf, 
 }
 
 
-inline u_char* ngx_http_request_status_time(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_time(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+11, 8);
     return p;
 }
 
 
-inline u_char* ngx_http_request_status_year(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_year(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data, 4);
     return p;
 }
 
-inline u_char* ngx_http_request_status_month(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_month(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+5, 2);
     return p;
 }
 
-inline u_char* ngx_http_request_status_day(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_day(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+8, 2);
     return p;
 }
 
-inline u_char* ngx_http_request_status_hour(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_hour(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+11, 2);
     return p;
 }
 
-inline u_char* ngx_http_request_status_minute(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_minute(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+14, 2);
     return p;
 }
 
-inline u_char* ngx_http_request_status_second(ngx_http_request_t *r, u_char *buf, ngx_http_request_status_op_t *op)
+inline u_char* ngx_http_request_stats_second(ngx_http_request_t *r, u_char *buf, ngx_http_request_stats_op_t *op)
 {
 	u_char* p = ngx_cpymem(buf, ngx_cached_err_log_time.data+17, 2);
     return p;
@@ -239,8 +239,8 @@ inline u_char* ngx_http_request_status_second(ngx_http_request_t *r, u_char *buf
 
 
 inline u_char *
-ngx_http_request_status_bytes_sent(ngx_http_request_t *r, u_char *buf,
-    ngx_http_request_status_op_t *op)
+ngx_http_request_stats_bytes_sent(ngx_http_request_t *r, u_char *buf,
+    ngx_http_request_stats_op_t *op)
 {
     return ngx_sprintf(buf, "%O", r->connection->sent);
 }
@@ -252,8 +252,8 @@ ngx_http_request_status_bytes_sent(ngx_http_request_t *r, u_char *buf,
  */
 
 inline u_char *
-ngx_http_request_status_body_bytes_sent(ngx_http_request_t *r, u_char *buf,
-    ngx_http_request_status_op_t *op)
+ngx_http_request_stats_body_bytes_sent(ngx_http_request_t *r, u_char *buf,
+    ngx_http_request_stats_op_t *op)
 {
     off_t  length;
 
@@ -270,8 +270,8 @@ ngx_http_request_status_body_bytes_sent(ngx_http_request_t *r, u_char *buf,
 
 
 inline u_char *
-ngx_http_request_status_request_length(ngx_http_request_t *r, u_char *buf,
-    ngx_http_request_status_op_t *op)
+ngx_http_request_stats_request_length(ngx_http_request_t *r, u_char *buf,
+    ngx_http_request_stats_op_t *op)
 {
     return ngx_sprintf(buf, "%O", r->request_length);
 }

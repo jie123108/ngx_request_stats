@@ -1,6 +1,6 @@
 
-HTTP_MODULES="$HTTP_MODULES ngx_http_request_status_module"
-NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_request_status_module.c"
+HTTP_MODULES="$HTTP_MODULES ngx_http_request_stats_module"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_request_stats_module.c"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_shmap.c"
 
 CFLAGS="$CFLAGS "
