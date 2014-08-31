@@ -1,19 +1,19 @@
-# Name 
+# Nginx统计模块 
 
-  ngx_request_status是一个nginx状态统计模块，其统计项是可配置的，并且可以统计不同的虚拟主机，不同的URL。可以统计的包括请求次数，各个状态码的次数，输出的流量累计信息，平均处理时间等等。
+  ngx_request_status是一个nginx统计模块，其统计项是可配置的，并且可以统计不同的虚拟主机，不同的URL。可以统计的包括请求次数，各个状态码的次数，输出的流量累计信息，平均处理时间等等。
 
-# Table of Contents
+# 目录
 
-* [Synopsis](#synopsis)
-* [Nginx Compatibility] (#nginx-compatibility)
-* [Module Compile] (#module-compile)
-* [Module Variables](#module-variables)
-* [Directives](#directives)
+* [示例配置](#示例配置)
+* [Nginx兼容性] (#nginx兼容性)
+* [模块编译] (#模块编译)
+* [模块变量](#模块变量)
+* [模块指令](#模块指令)
     * [shmap_size](#shmap_size)
     * [shmap_exptime](#shmap_exptime)
     * [request_status](#request_status)
     * [request_status_query](#request_status_query)
-* [Statistical query](#statistical-query)
+* [统计查询](#统计查询)
 	* [文本格式](#文本格式)
 	* [html格式](#html格式)
  	* [json格式](#json格式)
@@ -23,7 +23,7 @@
 * [简单脚本测试](#简单脚本测试)
 * [相关模块](#相关模块)
 
-# Synopsis
+# 示例配置
 ```nginx
 http {
 	request_status statby_host "$host";	
@@ -101,8 +101,8 @@ http {
 
 ```
 
-# Nginx Compatibility
-The latest module is compatible with the following versions of Nginx:
+# Nginx兼容性
+本模块兼容以下版本nginx:
 * 1.7.x (last tested: 1.7.4)
 * 1.6.x (last tested: 1.6.1)
 * 1.4.x (last tested: 1.4.7)
@@ -110,7 +110,7 @@ The latest module is compatible with the following versions of Nginx:
 * 1.0.x (last tested: 1.0.15)
 
 
-# Module Compile
+# 模块编译
 ```
 # echo-nginx-module只是测试时需要使用,本模块并不依赖它。
 cd nginx-1.x.x
@@ -120,7 +120,7 @@ make
 make install
 ```
 
-# Module Variables
+# 模块变量
 * nginx_core模块支持的变量：http://nginx.org/en/docs/http/ngx_http_core_module.html#variables
 * 本模块变量
     * uri_full 重定向之前的uri。
@@ -134,7 +134,7 @@ make install
     * minute 当前分
     * second 当前秒
 
-# Directives
+# 模块指令
 * [shmap_size](#shmap_size)
 * [shmap_exptime](#shmap_exptime)
 * [request_status](#request_status)
@@ -224,9 +224,9 @@ location /status {
 ```
 统计查询请见[统计查询](#统计查询)一节
 
-Statistical query
+统计查询
 --------------
-&nbsp;&nbsp;配置好request_status_query后，就可以通过相应的uri访问统计结果，比如上节配置中，访问
+&nbsp;&nbsp;开启request_status_query后，就可以通过相应的uri访问统计结果，比如上节配置中，访问
 http://192.168.1.201/status 就可以显示相关统计信息。**192.168.1.201是我的主机**
 
 查询结果中一般有如下几个字段：
