@@ -387,7 +387,7 @@ pc          1       182     205     0
 
 本测试对应配置在Synopsis一节中。
 测试依赖于curl命令，请确认你的系统已经安装curl命令行。
-源代码目录下的[test.sh](#test.sh)
+源代码目录下的[test.sh](test.sh)
 ```bash
 for ((i=0;i<20;i++));do
 curl http://127.0.0.1:81/$RANDOM
