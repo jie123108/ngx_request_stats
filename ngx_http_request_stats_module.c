@@ -526,6 +526,7 @@ void request_stats_foreach(ngx_shmap_node_t* node, void* extarg)
 
 	if(args->clean>0){
 		ngx_memzero(value, sizeof(request_stats_value_t));
+		value->stats_time = (uint32_t)ngx_time();
 	}
 }
 
