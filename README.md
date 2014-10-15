@@ -124,7 +124,7 @@ make install
 * nginx_core模块支持的变量：http://nginx.org/en/docs/http/ngx_http_core_module.html#variables
 * 本模块变量
     * uri_full 重定向之前的uri。
-    * stats Http响应码
+    * status Http响应码
     * date 当前日期，格式为：1970-09-28
     * time 当前时间，格式为：12:00:00
     * year 当前年份
