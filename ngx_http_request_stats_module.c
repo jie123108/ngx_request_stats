@@ -8,7 +8,11 @@
 #include <ngx_http.h>
 #include <time.h>
 #include <string.h>
+#ifdef NGX_SHMAP
 #include "ngx_shmap.h"
+#else
+#include "_ngx_shmap.h"
+#endif
 #include "ngx_http_request_stats_module.h"
 
 #define atom_add(p, n) __sync_add_and_fetch(p, n);
@@ -393,6 +397,7 @@ typedef struct {
 	const char* http_code;
 	const char* http_code_end;
 	const char* line_end;
+	const char* line_separate; //行之间的分割符(如json之行的,)
 	const char* mark_end;
 
 	const char* all_end;
@@ -456,7 +461,8 @@ static resp_format_t fmt_json = {
 	.http_code_begin="\"status\":{",
 	.http_code="\"%03d\":%d,",
 	.http_code_end="}",
-	.line_end="},\n",
+	.line_end="}",
+	.line_separate=",\n",
 	.mark_end="}\n"
 };
 
@@ -473,6 +479,7 @@ typedef struct {
 	ngx_str_t* stats_name;//当有该参数时，只取该统计项的值。
 	ngx_uint_t stats_name_user_flags;
 	ngx_http_request_t* r;
+	ngx_int_t line; //当前行,从1开始。
 }foreach_args_t;
 
 void request_stats_foreach(ngx_shmap_node_t* node, void* extarg)
@@ -498,6 +505,11 @@ void request_stats_foreach(ngx_shmap_node_t* node, void* extarg)
 	request_stats_value_t* value = (request_stats_value_t*)(node->data+node->key_len);
 	if(value->request_count < 1){
 		return;
+	}
+	
+	args->line++;
+	if(args->line > 1){
+		ngx_sappend(buf->last, fmt->line_separate);
 	}
 	ngx_sappend(buf->last, fmt->line_begin);
 

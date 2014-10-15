@@ -2,7 +2,9 @@
  * Author: jie123108@163.com
  * Copyright: jie123108
  *************************************************/
-#include "ngx_shmap.h"
+#ifndef NGX_SHMAP
+
+#include "_ngx_shmap.h"
 #include <assert.h>
 
 #define NLOG_DEBUG(format, args...);
@@ -1161,4 +1163,4 @@ ngx_http_lua_find_zone(u_char *name_data, size_t name_len)
     return NULL;
 }
 #endif
-
+#endif

@@ -1,6 +1,6 @@
-
-#ifndef __NGX_SHMAP_H__
-#define __NGX_SHMAP_H__
+#ifndef NGX_SHMAP
+#ifndef __STATS_NGX_SHMAP_H__
+#define __STATS_NGX_SHMAP_H__
 /*************************************************
  * Author: jie123108@163.com
  * Copyright: jie123108
@@ -112,4 +112,4 @@ void ngx_str_set_int64(ngx_str_t* key, int64_t* ikey);
 void ngx_str_set_double(ngx_str_t* key, double* value);
 
 #endif
-
+#endif
