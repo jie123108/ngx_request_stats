@@ -2,28 +2,28 @@
 
   ngx_request_stats是一个nginx统计模块，其统计项是可配置的，并且可以统计不同的虚拟主机，不同的URL。可以统计的包括请求次数，各个状态码的次数，输出的流量累计信息，平均处理时间等等。
 
-# 目录
+# Table Of Contents
 
-* [示例配置](#示例配置)
-* [Nginx兼容性] (#nginx兼容性)
-* [模块编译] (#模块编译)
-* [模块变量](#模块变量)
-* [模块指令](#模块指令)
+* [示例配置](#synopsis)
+* [Nginx兼容性](#compatibility)
+* [模块编译](#installation)
+* [模块变量](#variables)
+* [模块指令](#directives)
     * [shmap_size](#shmap_size)
     * [shmap_exptime](#shmap_exptime)
     * [request_stats](#request_stats)
     * [request_stats_query](#request_stats_query)
-* [统计查询](#统计查询)
-	* [文本格式](#文本格式)
-	* [html格式](#html格式)
- 	* [json格式](#json格式)
-	* [查询并且将查询项清零](#查询并且将查询项清零)
-	* [查询某一个统计项](#查询某一个统计项)
-* [作用域说明](#作用域说明)
-* [简单脚本测试](#简单脚本测试)
-* [相关模块](#相关模块)
+* [统计查询](#statistics-query)
+	* [文本格式](#text-format)
+	* [html格式](#html-format)
+ 	* [json格式](#json-format)
+	* [查询并且将查询项清零](#query-and-clean)
+	* [查询某一个统计项](#query-by-status_name)
+* [作用域说明](#scope)
+* [简单脚本测试](#simple-test)
+* [相关模块](#see-also)
 
-# 示例配置
+# Synopsis
 ```nginx
 http {
 	request_stats statby_host "$host";	
@@ -101,7 +101,7 @@ http {
 
 ```
 
-# Nginx兼容性
+# Compatibility
 本模块兼容以下版本nginx:
 * 1.7.x (last tested: 1.7.4)
 * 1.6.x (last tested: 1.6.1)
@@ -110,7 +110,7 @@ http {
 * 1.0.x (last tested: 1.0.15)
 
 
-# 模块编译
+# Installation
 ```
 # echo-nginx-module只是测试时需要使用,本模块并不依赖它。
 cd nginx-1.x.x
@@ -120,7 +120,7 @@ make
 make install
 ```
 
-# 模块变量
+# Variables
 * nginx_core模块支持的变量：http://nginx.org/en/docs/http/ngx_http_core_module.html#variables
 * 本模块变量
     * uri_full 重定向之前的uri。
@@ -134,7 +134,7 @@ make install
     * minute 当前分
     * second 当前秒
 
-# 模块指令
+# Directives
 * [shmap_size](#shmap_size)
 * [shmap_exptime](#shmap_exptime)
 * [request_stats](#request_stats)
@@ -181,21 +181,21 @@ request_stats statby_host "$host";
 ```nginx
 request_stats statby_uri "uri:$uri"; #还添加了 uri:前缀。
 ```
-### 按请求参数(GET)进行统计
+#### 按请求参数(GET)进行统计
 ```nginx
 request_stats statby_arg "clitype:$arg_client_type"; #按参数client_type统计
 ```
 
-### 按uri和参数进行统计
+#### 按uri和参数进行统计
 ```nginx
 request_stats statby_uriarg "$uri?$arg_from";	
 ```
 
-### 按HTTP请求头字段进行统计
+#### 按HTTP请求头字段进行统计
 ```nginx
 request_stats statby_uriarg "header_in:$http_city";
 ```
-### 按HTTP响应头字段进行统计
+#### 按HTTP响应头字段进行统计
 ```nginx
 # *注意，当前location下通过add_header添加的响应头读取不到。
 request_stats statby_uriarg "cache:$sent_http_cache";
@@ -224,7 +224,7 @@ location /stats {
 ```
 统计查询请见[统计查询](#统计查询)一节
 
-统计查询
+Statistics Query
 --------------
 &nbsp;&nbsp;开启request_stats_query后，就可以通过相应的uri访问统计结果，比如上节配置中，访问
 http://192.168.1.201/stats 就可以显示相关统计信息。**192.168.1.201是我的主机**
@@ -240,7 +240,7 @@ http://192.168.1.201/stats 就可以显示相关统计信息。**192.168.1.201是我的主机**
 
 &nbsp;&nbsp;**以下所有查询结果都是在运行[简单脚本测试](#简单脚本测试)一节中的测试脚本后产生的。**
 
-#### 文本格式
+#### Text Format
 http://192.168.1.201/stats
 ```bash
 # Optional parameters:
@@ -265,11 +265,11 @@ uri:/byuri/14858	2014-08-31 22:16:30	1	169	186	0	 200:1
 uri:/byuri/10475	2014-08-31 22:16:30	1	169	186	0	 200:1
 ...
 ``` 
-#### html格式
+#### Html Format
 http://192.168.1.201/stats?fmt=html
 ![查询界面](view_html.png)
 
-#### json格式
+#### Json Format
 http://192.168.1.201/stats?fmt=json
 ```json
 {"Optional parameters":{
@@ -296,11 +296,11 @@ http://192.168.1.201/stats?fmt=json
 }
 }
 ```
-#### 查询并且将查询项清零
+#### Query And Clean
 http://192.168.1.201/stats?clean=true
 使用clean=true参数后，本次查询结果依然正常显示，只是所有结果项会被清零。
 
-#### 查询某一个统计项
+#### Query by status_name
 * http://192.168.1.201/stats?stats_name=statby_headerin
 
 ```text
@@ -323,7 +323,7 @@ uri:/byuri/24415	2014-08-31 22:16:30	1	169	186	0	 200:1
 uri:/byuri/20883	2014-08-31 22:16:30	1	169	186	0	 200:1
 ```
 
-#作用域说明
+# Scope
 >request_stats指令作用域是:
 `NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF`,也就是说request_stats指令在http,server,location,if等节点下都可以出现。但是由于本模块是一个在NGX_HTTP_LOG_PHASE阶段的插件，一次请求只会有一个配置项是有效。当在不同的层次中出现时，只有最内层的会启作用。当然，如果同一层里面有多个request_stats指令，多个都会有效果。比如：
 ```
@@ -383,7 +383,7 @@ pc          1       182     205     0
 
 
 
-#### 简单脚本测试
+#### Simple Test
 
 本测试对应配置在Synopsis一节中。
 测试依赖于curl命令，请确认你的系统已经安装curl命令行。
@@ -409,10 +409,22 @@ done;
 
 ```
 
-#### 相关模块
+# See Also
 &nbsp;&nbsp;&nbsp;&nbsp;本模块把所有统计信息都存储在内存中，需要用户自己获取相关信息，再存储，汇总。作者的另外一个项目[ngx_req_stat](https://github.com/jie123108/ngx_req_stat)也是一个请求统计模块，但它功能更加强大，不光key是可以自定义的，连统计的值也是可以自定义的。并且统计信息存储在mongodb中。项目地址：(https://github.com/jie123108/ngx_req_stat)
 
-联系作者:
-=====
-jie123108@163.com
 
+Authors
+=======
+
+* liuxiaojie (刘小杰)  <jie123108@163.com>
+
+[Back to TOC](#table-of-contents)
+
+Copyright & License
+===================
+
+This module is licenced under the BSD license.
+
+Copyright (C) 2014, by liuxiaojie (刘小杰)  <jie123108@163.com>
+
+All rights reserved.
