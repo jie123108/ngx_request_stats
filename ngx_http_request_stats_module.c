@@ -307,52 +307,13 @@ SHM_GET:
 	return rc;
 }
 
-char *strcut(char *strin, unsigned int frompos,unsigned int count) {
-    int len = strlen(strin);
-    if(count > 0){
-        if(count > len-frompos) count = len-frompos;
-        memmove(strin+frompos, strin+frompos+count, len-frompos-count+1);
-    }
-    return strin;
-}
 
-char *time2str(const time_t *t, const char *mask, char *sout) {
-    struct tm *s;
-    char ch, b[10], b1[20];
-    unsigned int len, i, j;
-
-    sout[0] = 0;
-    s = localtime(t);
-
-    for(i = 0; i < strlen(mask); i++) {
-        len = 0;
-
-        if(strchr("DMYhms", ch = mask[i])) {
-            j = i; len = 1;
-            while(mask[++j] == ch) len++;
-            sprintf(b, "%%0%dd", len);
-            i += len-1;
-
-            switch(ch) {
-                case 'D': sprintf(b1, b, s->tm_mday); break;
-                case 'M': sprintf(b1, b, s->tm_mon+1); break;
-                case 'Y':
-                    j = s->tm_year + 1900;
-                    sprintf(b1, b, j);
-                    if(len <= 3) strcut(b1, 0, 2);
-                    break;
-                case 'h': sprintf(b1, b, s->tm_hour); break;
-                case 'm': sprintf(b1, b, s->tm_min); break;
-                case 's': sprintf(b1, b, s->tm_sec); break;
-            }
-            strcat(sout, b1);
-        } else {
-            len = strlen(sout);
-            sout[len+1] = 0;
-            sout[len] = mask[i];
-        }
-    }
-    return sout;
+char *time2str(const time_t *t, char *sout, size_t buf_len) {
+	struct tm result;
+	memset(&result,0,sizeof(result));
+    localtime_r(t, &result);
+	strftime(sout, buf_len, "%F %T", &result);
+	return sout;
 }
 
 /**
@@ -425,7 +386,7 @@ static resp_format_t fmt_plaintext = {
 static resp_format_t fmt_html = {
 	.all_begin="<body>\n",
 	.all_end="</body>\n",
-	.comment_begin="<table width=\"1000\" align='center'>\n"
+	.comment_begin="<table width=\"1200\" align='center'>\n"
 					"<tr><td>Optional parameters:</td></tr>\n"
 					"<tr>\n<td>\n<ul>\n",
 	.comment_clean="<li>"COMMENT_CLEAN"</li>\n",
@@ -433,10 +394,10 @@ static resp_format_t fmt_html = {
 	.comment_stats_name="<li>"COMMENT_STAT_NAME"</li>\n",
 	.comment_end="</ul>\n</td>\n</tr>\n</table>\n",
 	
-	.mark_begin="<table width=\"1000\" bgcolor=\"#FFFFFF\" align=\"center\">\n",
+	.mark_begin="<table width=\"1200\" bgcolor=\"#FFFFFF\" align=\"center\">\n",
 	.title_line="<tr bgcolor=\"#666666\" height=\"25\"><td>key</td><td>stats_time</td><td>request</td><td>recv</td><td>sent</td><td>avg_time</td><td>status</td></tr>\n",
 	.line_begin="<tr height=\"20\" bgcolor=\"#CCCCCC\">",	
-	.line="<td>%V</td><td>%s</td><td>%uD</td><td>%uL</td><td>%uL</td><td>%uL</td><td>",
+	.line="<td nowrap='nowrap'>%V</td><td nowrap='nowrap'>%s</td><td nowrap='nowrap'>%uD</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%uL</td><td>",
 	.http_code_begin=NULL,
 	.http_code=" %03d:%d|",
 	.http_code_end=NULL,
@@ -516,7 +477,7 @@ void request_stats_foreach(ngx_shmap_node_t* node, void* extarg)
 	uint32_t request_count = value->request_count<1?1:value->request_count;
 	time_t stats_time = (time_t)value->stats_time;
 	ngx_sappend(buf->last, fmt->line,
-					&key, time2str(&stats_time,"YYYY-MM-DD hh:mm:ss", buf_time),
+					&key, time2str(&stats_time, buf_time, sizeof(buf_time)),
 					value->request_count, 
 					value->recv, value->sent,
 					value->request_time/request_count
