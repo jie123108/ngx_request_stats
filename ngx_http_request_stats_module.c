@@ -299,6 +299,7 @@ SHM_GET:
 					"ngx_shmap_set(key=%V) failed! rc=%d",
 					key, rc);
 			}
+
 			goto SHM_GET;
 		}else{
 			rc = NGX_ERROR;
@@ -377,14 +378,16 @@ static resp_format_t fmt_plaintext = {
 	.mark_begin=NULL,
 	.title_line="key\tstats_time\trequest\trecv\tsent\tavg_time\tstatus\n",
 	.line_begin=NULL,						//
-	.line="%V\t%s\t%uD\t%uL\t%uL\t%uL\t",
+	.line="%V\t%s\t%uD\t%uL\t%uL\t%.1f\t",
 	.http_code_begin=NULL,.http_code=" %03d:%d,",.http_code_end=NULL,
 	.line_end="\n",
 	.mark_end=NULL
 };
 
 static resp_format_t fmt_html = {
-	.all_begin="<body>\n",
+	.all_begin="<head>\n"
+			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
+			"<title>Stats</title></head><body>\n",
 	.all_end="</body>\n",
 	.comment_begin="<table width=\"1200\" align='center'>\n"
 					"<tr><td>Optional parameters:</td></tr>\n"
@@ -397,7 +400,7 @@ static resp_format_t fmt_html = {
 	.mark_begin="<table width=\"1200\" bgcolor=\"#FFFFFF\" align=\"center\">\n",
 	.title_line="<tr bgcolor=\"#666666\" height=\"25\"><td>key</td><td>stats_time</td><td>request</td><td>recv</td><td>sent</td><td>avg_time</td><td>status</td></tr>\n",
 	.line_begin="<tr height=\"20\" bgcolor=\"#CCCCCC\">",	
-	.line="<td nowrap='nowrap'>%V</td><td nowrap='nowrap'>%s</td><td nowrap='nowrap'>%uD</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%uL</td><td>",
+	.line="<td nowrap='nowrap'>%V</td><td nowrap='nowrap'>%s</td><td nowrap='nowrap'>%uD</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%uL</td><td nowrap='nowrap'>%.1f</td><td>",
 	.http_code_begin=NULL,
 	.http_code=" %03d:%d|",
 	.http_code_end=NULL,
@@ -418,7 +421,7 @@ static resp_format_t fmt_json = {
 	.mark_begin="\"request-stat\":{\n",
 	.title_line=NULL,
 	.line_begin=NULL,						//
-	.line="\"%V\":{\"stats_time\":\"%s\",\"request\":%uD,\"recv\":%uL,\"sent\":%uL,\"avg_time\":%uL,",
+	.line="\"%V\":{\"stats_time\":\"%s\",\"request\":%uD,\"recv\":%uL,\"sent\":%uL,\"avg_time\":%.1f,",
 	.http_code_begin="\"status\":{",
 	.http_code="\"%03d\":%d,",
 	.http_code_end="}",
@@ -480,7 +483,7 @@ void request_stats_foreach(ngx_shmap_node_t* node, void* extarg)
 					&key, time2str(&stats_time, buf_time, sizeof(buf_time)),
 					value->request_count, 
 					value->recv, value->sent,
-					value->request_time/request_count
+					value->request_time/(request_count*1.0)
 					);
 	unsigned i;
 	int del_comma = 0;
@@ -521,7 +524,7 @@ ngx_int_t ngx_http_request_stats_query_handler(ngx_http_request_t *r)
     if(ngx_http_arg(r, (u_char*)"stats_name", sizeof("stats_name")-1, &stats_name) == NGX_OK){
 		if(stats_name.len > 0){
 			foreach_args.stats_name = &stats_name;
-			foreach_args.stats_name_user_flags = ngx_crc32_long(stats_name.data,stats_name.len);
+			foreach_args.stats_name_user_flags = ngx_crc32_long(stats_name.data,stats_name.len);			
 		}
     }
     ngx_str_t szclean = ngx_null_string;
@@ -656,7 +659,8 @@ ngx_http_request_stats_log_handler(ngx_http_request_t *r)
 
 		ngx_str_t key = {p_key-buf_key, buf_key};
 
-		uint32_t user_flag = ngx_crc32_long(stat->stats_name.data, stat->stats_name.len);
+		uint32_t user_flag = ngx_crc32_long(stat[l].stats_name.data, stat[l].stats_name.len);
+
 		request_stats_value_t* value=NULL;
 		ngx_int_t rc = 0;
 		rc = ngx_http_request_stats_shm_get_ex(r, &key, user_flag, &value);
