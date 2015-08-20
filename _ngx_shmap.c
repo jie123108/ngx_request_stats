@@ -26,11 +26,7 @@ void ngx_str_set_int32(ngx_str_t* key, int32_t* value)
 	key->len= sizeof(int32_t);
 	key->data = (u_char*)value;
 }
-void ngx_str_set_int64(ngx_str_t* key, int64_t* value)
-{
-	key->len= sizeof(int64_t);
-	key->data = (u_char*)value;
-}
+
 void ngx_str_set_double(ngx_str_t* key, double* value)
 {
 	key->len= sizeof(double);
@@ -322,41 +318,6 @@ int ngx_shmap_get_int32(ngx_shm_zone_t* zone, ngx_str_t* key, int32_t* i)
 	return ret;
 }
 
-int ngx_shmap_get_int64(ngx_shm_zone_t* zone, ngx_str_t* key, int64_t* i)
-{
-	uint8_t value_type = VT_NULL;
-	ngx_str_t data = ngx_null_string;
-	int ret = ngx_shmap_get(zone, key, &data, &value_type,NULL,NULL);
-	if(ret == 0){
-		if(value_type != VT_INT64){
-			ret = -1;
-			NLOG_ERROR("ngx_shmap_get_int64(key=%V) return invalid value_type=%d",
-						key, value_type);
-		}else{
-			int64_t* p = (int64_t*)data.data;
-			*i = *p;
-		}
-	}
-	return ret;
-}
-
-int ngx_shmap_get_int64_and_clear(ngx_shm_zone_t* zone, ngx_str_t* key, int64_t* i)
-{
-	uint8_t value_type = VT_NULL;
-	ngx_str_t data = ngx_null_string;
-	int ret = ngx_shmap_get(zone, key, &data, &value_type,NULL,NULL);
-	if(ret == 0){
-		if(value_type != VT_INT64){
-			ret = -1;
-			NLOG_ERROR("ngx_shmap_get_int64(key=%V) return invalid value_type=%d",
-						key, value_type);
-		}else{
-			int64_t* p = (int64_t*)data.data;
-			*i = __sync_fetch_and_and(p, 0);
-		}
-	}
-	return ret;
-}
 
 int ngx_shmap_get(ngx_shm_zone_t* zone, ngx_str_t* key, 
 		ngx_str_t* data, uint8_t* value_type,uint32_t* exptime,
@@ -626,7 +587,7 @@ int ngx_shmap_safe_set(ngx_shm_zone_t* zone, ngx_str_t* key, ngx_str_t* value,
 }
 
 
-int ngx_shmap_inc_int(ngx_shm_zone_t* zone, ngx_str_t* key,int64_t i,uint32_t exptime, int64_t* ret)
+int ngx_shmap_inc_int(ngx_shm_zone_t* zone, ngx_str_t* key,int32_t i,uint32_t exptime, int32_t* ret)
 {
 	assert(zone != NULL);
 	assert(key != NULL);
@@ -634,19 +595,19 @@ int ngx_shmap_inc_int(ngx_shm_zone_t* zone, ngx_str_t* key,int64_t i,uint32_t ex
 	
 	ngx_int_t rc = 0;
 	ngx_str_t data = ngx_null_string;
-	uint8_t value_type = VT_INT64;
+	uint8_t value_type = VT_INT32;
 	rc = ngx_shmap_get(zone, key, &data, &value_type, NULL,NULL);
 	if(rc == 0){
-		if(value_type != VT_INT64){
+		if(value_type != VT_INT32){
 			NLOG_ERROR("key [%V] value_type [%d] invalid!",
 					key, value_type);
 			return -1;
 		}
-		int64_t* p = (int64_t*)data.data;
+		int32_t* p = (int32_t*)data.data;
 		*ret = __sync_add_and_fetch(p, i);
 	}else{
 		//不存在，插入新的
-		ngx_str_set_int64(&data, &i);
+		ngx_str_set_int32(&data, &i);
 		rc =ngx_shmap_set(zone, key, &data, value_type, exptime,0);
 		if(rc == 0){
 			*ret = i;

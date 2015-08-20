@@ -72,9 +72,7 @@ int ngx_shmap_get_ex(ngx_shm_zone_t* zone, ngx_str_t* key,
 		ngx_str_t* data, uint8_t* value_type,uint32_t* exptime,uint32_t** user_flags);
 
 int ngx_shmap_get_int32(ngx_shm_zone_t* zone, ngx_str_t* key, int32_t* i);
-int ngx_shmap_get_int64(ngx_shm_zone_t* zone, ngx_str_t* key, int64_t* i);
-int ngx_shmap_get_int64_and_clear(ngx_shm_zone_t* zone, 
-				ngx_str_t* key, int64_t* i);
+
 // 删除一个KEY
 int ngx_shmap_delete(ngx_shm_zone_t* zone, ngx_str_t* key);
 
@@ -103,12 +101,11 @@ int ngx_shmap_set(ngx_shm_zone_t* zone, ngx_str_t* key, ngx_str_t* value,
 			uint8_t value_type, uint32_t exptime, uint32_t user_flags);
 
 //给key增加i,并返回增加后的值。
-int ngx_shmap_inc_int(ngx_shm_zone_t* zone, ngx_str_t* key,int64_t i,uint32_t exptime, int64_t* ret);
+int ngx_shmap_inc_int(ngx_shm_zone_t* zone, ngx_str_t* key,int32_t i,uint32_t exptime, int32_t* ret);
 //给key增加d,并返回增加后的值。
 int ngx_shmap_inc_double(ngx_shm_zone_t* zone, ngx_str_t* key,double d,uint32_t exptime,double* ret);
 
 void ngx_str_set_int32(ngx_str_t* key, int32_t* ikey);
-void ngx_str_set_int64(ngx_str_t* key, int64_t* ikey);
 void ngx_str_set_double(ngx_str_t* key, double* value);
 
 #endif

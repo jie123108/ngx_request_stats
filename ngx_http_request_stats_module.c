@@ -52,9 +52,9 @@ typedef struct {
 	uint32_t stats_time; //stat
 	uint32_t request_count; //请求次数
 	uint32_t req_count_detail[HTTP_CODE_CNT]; //每种错误码的详细记录
-	uint64_t request_time;//请求时间累计(毫秒)。
-	uint64_t recv;   //接收的请求总大小(byte)
-	uint64_t sent;   //发送的响应总大小(byte)
+	uint32_t request_time;//请求时间累计(毫秒)。
+	uint32_t recv;   //接收的请求总大小(byte)
+	uint32_t sent;   //发送的响应总大小(byte)
 }request_stats_value_t;
 
 typedef struct {
