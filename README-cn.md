@@ -2,7 +2,7 @@
 
   ngx_request_stats是一个nginx统计模块，其统计项是可配置的，并且可以统计不同的虚拟主机，不同的URL。可以统计的包括请求次数，各个状态码的次数，输出的流量累计信息，平均处理时间等等。
 
-# Table Of Contents
+# Table of contents
 
 * [示例配置](#synopsis)
 * [Nginx兼容性](#compatibility)
@@ -17,7 +17,7 @@
 	* [文本格式](#text-format)
 	* [html格式](#html-format)
  	* [json格式](#json-format)
-	* [查询并且将查询项清零](#query-and-clean)
+	* [查询并且将查询项清零](#query-and-clear)
 	* [查询某一个统计项](#query-by-status_name)
 * [作用域说明](#scope)
 * [简单脚本测试](#simple-test)
@@ -148,7 +148,8 @@ shmap_size
 
 **context:** *http*
 
-定义统计使用的共享内存大小。可以使用k,m,g等单位表示KB,MB,GB。
+定义统计所使用的共享内存大小。
+*&lt;size&gt;*可以使用大小单位，如k,m,g。
 
 
 shmap_exptime
@@ -159,7 +160,8 @@ shmap_exptime
 
 **context:** *http*
 
-定义统计信息在共享内存中的过期时间。单位为秒，可以使用m,h,d等表示分钟，小时，天。
+定义统计信息在共享内存中的过期时间。
+可以使用m,h,d等表示分钟，小时，天。
 
 request_stats
 ----------
@@ -171,7 +173,7 @@ request_stats
 
 定义统计信息格式，使用 `request_stats off;` 可关闭某个http,server,location下的统计。
 * stats-name是该统计名称(类别)，可按功能随意定义，在后面的查询指令中，可指定stats-name查询指定的统计类型。
-* stats-key定义统计的key。key中可使用各种变量，及字符串，这样不同的请求便分别记录。[支持的变量](#支持的变量)一节中列出了所有支持的变量。**注意：不要使用过于随机化的变量当成key,这样会导致每个请求有一份统计信息，因而占用大量共享内存空间**
+* stats-key定义统计的key。key中可使用各种变量，及字符串，这样不同的请求便分别记录。[支持的变量](#variables)一节中列出了所有支持的变量。**注意：不要使用过于随机化的变量当成key,这样会导致每个请求有一份统计信息，因而占用大量共享内存空间**
 
 #### 按host进行统计
 ```nginx
@@ -222,9 +224,9 @@ location /stats {
 	request_stats_query on;
 }
 ```
-统计查询请见[统计查询](#统计查询)一节
+统计查询请见[统计查询](#statistics-query)一节
 
-Statistics Query
+Statistics-Query
 --------------
 &nbsp;&nbsp;开启request_stats_query后，就可以通过相应的uri访问统计结果，比如上节配置中，访问
 http://192.168.1.201/stats 就可以显示相关统计信息。**192.168.1.201是我的主机**
@@ -238,7 +240,7 @@ http://192.168.1.201/stats 就可以显示相关统计信息。**192.168.1.201是我的主机**
 * avg_time, 请求平均时间(毫秒)
 * stats, http响应码, 其中499是后端超时了。
 
-&nbsp;&nbsp;**以下所有查询结果都是在运行[简单脚本测试](#简单脚本测试)一节中的测试脚本后产生的。**
+&nbsp;&nbsp;**以下所有查询结果都是在运行[简单脚本测试](#simple-test)一节中的测试脚本后产生的。**
 
 #### Text Format
 http://192.168.1.201/stats
@@ -269,7 +271,7 @@ uri:/byuri/10475	2014-08-31 22:16:30	1	169	186	0	 200:1
 http://192.168.1.201/stats?fmt=html
 ![查询界面](view_html.png)
 
-#### Json Format
+#### Json format 
 http://192.168.1.201/stats?fmt=json
 ```json
 {"Optional parameters":{
@@ -296,7 +298,7 @@ http://192.168.1.201/stats?fmt=json
 }
 }
 ```
-#### Query And Clean
+#### query and clear
 http://192.168.1.201/stats?clean=true
 使用clean=true参数后，本次查询结果依然正常显示，只是所有结果项会被清零。
 
