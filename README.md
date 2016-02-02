@@ -1,27 +1,27 @@
-# NginxÍ³¼ÆÄ£¿é 
+# Nginx statistics module 
+   ngx_request_stats is a statistical nginx module. Statistical item is configurable, and can count different virtual hosts, different URL. You can request statistics including the number of times of each status code, the flowing output of the accumulated information, the average processing time, and so on. 
+   
+[ä¸­æ–‡ç‰ˆè¯´æ˜](README-cn.md)
+# Table of contents 
 
-  ngx_request_statsÊÇÒ»¸önginxÍ³¼ÆÄ£¿é£¬ÆäÍ³¼ÆÏîÊÇ¿ÉÅäÖÃµÄ£¬²¢ÇÒ¿ÉÒÔÍ³¼Æ²»Í¬µÄĞéÄâÖ÷»ú£¬²»Í¬µÄURL¡£¿ÉÒÔÍ³¼ÆµÄ°üÀ¨ÇëÇó´ÎÊı£¬¸÷¸ö×´Ì¬ÂëµÄ´ÎÊı£¬Êä³öµÄÁ÷Á¿ÀÛ¼ÆĞÅÏ¢£¬Æ½¾ù´¦ÀíÊ±¼äµÈµÈ¡£
-
-# Table Of Contents
-
-* [Ê¾ÀıÅäÖÃ](#synopsis)
-* [Nginx¼æÈİĞÔ](#compatibility)
-* [Ä£¿é±àÒë](#installation)
-* [Ä£¿é±äÁ¿](#variables)
-* [Ä£¿éÖ¸Áî](#directives)
-    * [shmap_size](#shmap_size)
-    * [shmap_exptime](#shmap_exptime)
-    * [request_stats](#request_stats)
-    * [request_stats_query](#request_stats_query)
-* [Í³¼Æ²éÑ¯](#statistics-query)
-	* [ÎÄ±¾¸ñÊ½](#text-format)
-	* [html¸ñÊ½](#html-format)
- 	* [json¸ñÊ½](#json-format)
-	* [²éÑ¯²¢ÇÒ½«²éÑ¯ÏîÇåÁã](#query-and-clean)
-	* [²éÑ¯Ä³Ò»¸öÍ³¼ÆÏî](#query-by-status_name)
-* [×÷ÓÃÓòËµÃ÷](#scope)
-* [¼òµ¥½Å±¾²âÊÔ](#simple-test)
-* [Ïà¹ØÄ£¿é](#see-also)
+* [Synopsis] (#synopsis) 
+* [Compatibility] (#compatibility) 
+* [Installation] (#installation) 
+* [Variables] (#variables) 
+* [Directives] (#directives) 
+     * [shmap_size] (#shmap_size) 
+     * [shmap_exptime] (#shmap_exptime) 
+     * [request_stats] (#request_stats) 
+     * [request_stats_query] (#request_stats_query) 
+* [statistics Query] (#statistics-query) 
+    * [text format] (#text-format) 
+    * [html format] (#html-format) 
+    * [json format] (#json-format) 
+    * [Query and clear] (#query-and-clear) 
+    * [Query By stats_name] (#query-by-status_name) 
+* [Scoping] (#scope) 
+* [Simple test script] (#simple-test-script) 
+* [Related modules] (#see-also) 
 
 # Synopsis
 ```nginx
@@ -98,47 +98,46 @@ http {
 	}
   }
 }
-
 ```
 
 # Compatibility
-±¾Ä£¿é¼æÈİÒÔÏÂ°æ±¾nginx:
-* 1.7.x (last tested: 1.7.4)
-* 1.6.x (last tested: 1.6.1)
-* 1.4.x (last tested: 1.4.7)
-* 1.2.x (last tested: 1.2.9)
-* 1.0.x (last tested: 1.0.15)
+This module is compatible with the following versions nginx: 
+* 1.7.x (last tested: 1.7.4) 
+* 1.6.x (last tested: 1.6.1) 
+* 1.4.x (last tested: 1.4.7) 
+* 1.2.x (last tested: 1.2.9) 
+* 1.0.x (last tested: 1.0.15) 
 
 
 # Installation
 ```
-# echo-nginx-moduleÖ»ÊÇ²âÊÔÊ±ĞèÒªÊ¹ÓÃ,±¾Ä£¿é²¢²»ÒÀÀµËü¡£
-cd nginx-1.x.x
-./configure --add-module=path/to/ngx_request_stats \
---add-module=path/to/echo-nginx-module-0.49/
-make
-make install
+# echo-nginx-module just need to use for the test, this module does not depend on it. 
+cd nginx-1.x.x 
+./configure --add-module = path / to / ngx_request_stats \ 
+--add-module = path / to / echo-nginx-module-0.49 / 
+make 
+make install 
 ```
 
 # Variables
-* nginx_coreÄ£¿éÖ§³ÖµÄ±äÁ¿£ºhttp://nginx.org/en/docs/http/ngx_http_core_module.html#variables
-* ±¾Ä£¿é±äÁ¿
-    * uri_full ÖØ¶¨ÏòÖ®Ç°µÄuri¡£
-    * status HttpÏìÓ¦Âë
-    * date µ±Ç°ÈÕÆÚ£¬¸ñÊ½Îª£º1970-09-28
-    * time µ±Ç°Ê±¼ä£¬¸ñÊ½Îª£º12:00:00
-    * year µ±Ç°Äê·İ
-    * month µ±Ç°ÔÂ·İ
-    * day µ±Ç°ÈÕ
-    * hour µ±Ç°Ğ¡Ê±
-    * minute µ±Ç°·Ö
-    * second µ±Ç°Ãë
+* nginx_core module supports variable: http://nginx.org/en/docs/http/ngx_http_core_module.html#variables 
+* This module variables 
+     * uri_full: uri before redirect. 
+     * status: Http response codes 
+     * date: current date in the format: 1970-09-28 
+     * time: current time in the format: 12: 00:00 
+     * year: current year 
+     * month: current month 
+     * day: current date 
+     * hour: current hour 
+     * minute: current minute 
+     * second: current second 
 
 # Directives
-* [shmap_size](#shmap_size)
-* [shmap_exptime](#shmap_exptime)
-* [request_stats](#request_stats)
-* [request_stats_query](#request_stats_query)
+* [shmap_size] (#shmap_size) 
+* [shmap_exptime] (#shmap_exptime) 
+* [request_stats] (#request_stats) 
+* [request_stats_query] (#request_stats_query) 
 
 shmap_size
 ----------
@@ -148,8 +147,9 @@ shmap_size
 
 **context:** *http*
 
-¶¨ÒåÍ³¼ÆÊ¹ÓÃµÄ¹²ÏíÄÚ´æ´óĞ¡¡£¿ÉÒÔÊ¹ÓÃk,m,gµÈµ¥Î»±íÊ¾KB,MB,GB¡£
+Define shared memory size.
 
+The **&lt;size&gt;** argument accepts size units such as k,m and g.
 
 shmap_exptime
 ----------
@@ -159,86 +159,87 @@ shmap_exptime
 
 **context:** *http*
 
-¶¨ÒåÍ³¼ÆĞÅÏ¢ÔÚ¹²ÏíÄÚ´æÖĞµÄ¹ıÆÚÊ±¼ä¡£µ¥Î»ÎªÃë£¬¿ÉÒÔÊ¹ÓÃm,h,dµÈ±íÊ¾·ÖÖÓ£¬Ğ¡Ê±£¬Ìì¡£
+Definition of statistical information in the shared memory expiration time. 
+
+The **&lt;expire time&gt;** argument can be an integer, with an optional time unit, like s(second), m(minute), h(hour), d(day). The default time unit is s
 
 request_stats
-----------
-**syntax:** *request_stats &lt;stats-name&gt; &lt;stats-key&gt;*
+---------- 
+**syntax:** *request_stats &lt;stats-name&gt; &lt;stats-key&gt;* 
 
-**default:** *no*
+**default:** *no* 
 
-**context:** *http,server,location,location if*
+**context:** *http, server, location, location if* 
 
-¶¨ÒåÍ³¼ÆĞÅÏ¢¸ñÊ½£¬Ê¹ÓÃ `request_stats off;` ¿É¹Ø±ÕÄ³¸öhttp,server,locationÏÂµÄÍ³¼Æ¡£
-* stats-nameÊÇ¸ÃÍ³¼ÆÃû³Æ(Àà±ğ)£¬¿É°´¹¦ÄÜËæÒâ¶¨Òå£¬ÔÚºóÃæµÄ²éÑ¯Ö¸ÁîÖĞ£¬¿ÉÖ¸¶¨stats-name²éÑ¯Ö¸¶¨µÄÍ³¼ÆÀàĞÍ¡£
-* stats-key¶¨ÒåÍ³¼ÆµÄkey¡£keyÖĞ¿ÉÊ¹ÓÃ¸÷ÖÖ±äÁ¿£¬¼°×Ö·û´®£¬ÕâÑù²»Í¬µÄÇëÇó±ã·Ö±ğ¼ÇÂ¼¡£[Ö§³ÖµÄ±äÁ¿](#Ö§³ÖµÄ±äÁ¿)Ò»½ÚÖĞÁĞ³öÁËËùÓĞÖ§³ÖµÄ±äÁ¿¡£**×¢Òâ£º²»ÒªÊ¹ÓÃ¹ıÓÚËæ»ú»¯µÄ±äÁ¿µ±³Ékey,ÕâÑù»áµ¼ÖÂÃ¿¸öÇëÇóÓĞÒ»·İÍ³¼ÆĞÅÏ¢£¬Òò¶øÕ¼ÓÃ´óÁ¿¹²ÏíÄÚ´æ¿Õ¼ä**
+Statistics definition format, use the `request_stats off;` can close a statistic under the http, server, location. 
+* stats-name is the name of the statistics (category), according to the function arbitrarily defined, in the back of the query command, you can specify the stats-name query specified statistical type. 
+* stats-key definition of statistical key. key can be used the variables, and a string, so that different requests will be recorded separately. [Supported variable] (#variables) one lists all the supported variables. **Note: Do not use too randomized variables as key, this will cause each request has a statistical information, which take up a lot of shared memory space** 
 
-#### °´host½øĞĞÍ³¼Æ
-```nginx
-request_stats statby_host "$host";	
+#### Statistics by host 
+```nginx 
+request_stats statby_host "$host"; 
 ```
-#### °´uri½øĞĞÍ³¼Æ
-```nginx
-request_stats statby_uri "uri:$uri"; #»¹Ìí¼ÓÁË uri:Ç°×º¡£
+#### Statistics by uri 
+```nginx 
+request_stats statby_uri "uri: $uri"; # also adds uri: prefix. 
 ```
-#### °´ÇëÇó²ÎÊı(GET)½øĞĞÍ³¼Æ
-```nginx
-request_stats statby_arg "clitype:$arg_client_type"; #°´²ÎÊıclient_typeÍ³¼Æ
+#### Statistics by get request parameters
+```nginx 
+request_stats statby_arg "clitype: $arg_client_type"; # press parameters client_type statistics 
 ```
 
-#### °´uriºÍ²ÎÊı½øĞĞÍ³¼Æ
-```nginx
+#### Statistics by uri and parameters
+```nginx 
 request_stats statby_uriarg "$uri?$arg_from";	
 ```
 
-#### °´HTTPÇëÇóÍ·×Ö¶Î½øĞĞÍ³¼Æ
-```nginx
-request_stats statby_uriarg "header_in:$http_city";
+### Statistics by request header 
+```nginx 
+request_stats statby_uriarg "header_in: $http_city"; 
 ```
-#### °´HTTPÏìÓ¦Í·×Ö¶Î½øĞĞÍ³¼Æ
-```nginx
-# *×¢Òâ£¬µ±Ç°locationÏÂÍ¨¹ıadd_headerÌí¼ÓµÄÏìÓ¦Í·¶ÁÈ¡²»µ½¡£
-request_stats statby_uriarg "cache:$sent_http_cache";
+### Statistics by response header
+```nginx 
+request_stats statby_uriarg "cache: $sent_http_cache"; 
 ```
 
 request_stats_query
-----------
-**syntax:** *request_stats_query &lt;on&gt;*
+---------- 
+**syntax:** *request_stats_query &lt; on &gt;* 
 
-**default:** *off*
+**default:** *off* 
 
-**context:** *location*
+**context:** *location* 
 
-¿ªÆôÍ³¼Æ²éÑ¯Ä£¿é¡£¿ªÆôºó£¬¾Í¿ÉÒÔÍ¨¹ı¸Ãlocation·ÃÎÊµ½Í³¼ÆĞÅÏ¢¡£
-Í³¼ÆĞÅÏ¢²éÑ¯Ä£¿éÓĞÈı¸ö¿ÉÑ¡µÄ²ÎÊı£º
-* clean: ÎªtrueÊ±±íÊ¾£¬²éÑ¯Í³¼ÆĞÅÏ¢£¬²¢½«±¾´Î²éÑ¯µÄÍ³¼ÆÏîÇåÁã¡£
-* fmt: ¿ÉÑ¡ÖµÎª£ºhtml,json,text£¬·Ö±ğÒÔhtml,json,text¸ñÊ½ÏÔÊ¾¡£Ä¬ÈÏ¸ñÊ½Îªtext¡£html¿ÉÒÔÖ±½ÓÒÔä¯ÀÀÆ÷²é¿´£¬json¸ñÊ½·½±ãÄãÊ¹ÓÃpythonµÈ½Å±¾ÓïÑÔ½âÎö½á¹û¡£text¸ñÊ½·½±ãÔÚÃüÁîÏÂ²éÑ¯£¬¼°Í¨¹ıawkµÈshellÃüÁî½øĞĞ´¦Àí¡£
-* stats_name£ºÒª²éÑ¯µÄÍ³¼ÆÃû£¬¸ÃÍ³¼ÆÃû³Æ±ØĞëÊÇÔÚrequest_statsÖ¸ÁîµÄµÚÒ»¸ö²ÎÊıÖ¸¶¨µÄstats-nameÖĞµÄÒ»¸ö¡£ µ±²»Ö¸¶¨¸Ã²ÎÊıÊ±£¬±íÊ¾²éÑ¯ËùÓĞÍ³¼Æ¡£
+Open statistical query module. When turned on, you can have access to the statistics by the location. 
+Statistics Query module has three optional arguments: 
+* clean: is true that the query statistics and statistical items cleared for this query. 
+* fmt: optional values: html, json, text, respectively, html, json, text format. The default format is text. html browser can be viewed directly, allowing you to json format using scripting language(eg. python/php) parsing results. text format in order to facilitate inquiries, and processed through awk and other shell commands. 
+* stats_name: To count name queries, the statistics must be a name in the first parameter request_stats instructions specified in the stats-name. When this parameter is not specified, query all statistics. 
 
 
-×îĞ¡Ê¾Àı£º
-```nginx
-location /stats {
-	request_stats_query on;
-}
+Minimum sample: 
+```nginx 
+location / stats {
+request_stats_query on; 
+} 
 ```
-Í³¼Æ²éÑ¯Çë¼û[Í³¼Æ²éÑ¯](#Í³¼Æ²éÑ¯)Ò»½Ú
+Statistics Query see [statistical inquiry] (#statistical-queries) a 
 
-Statistics Query
---------------
-&nbsp;&nbsp;¿ªÆôrequest_stats_queryºó£¬¾Í¿ÉÒÔÍ¨¹ıÏàÓ¦µÄuri·ÃÎÊÍ³¼Æ½á¹û£¬±ÈÈçÉÏ½ÚÅäÖÃÖĞ£¬·ÃÎÊ
-http://192.168.1.201/stats ¾Í¿ÉÒÔÏÔÊ¾Ïà¹ØÍ³¼ÆĞÅÏ¢¡£**192.168.1.201ÊÇÎÒµÄÖ÷»ú**
+Statistics-Query
+-------------- 
+&nbsp; &nbsp; after opening request_stats_query, statistical results can be accessed via the corresponding uri, for example in the previous section configuration, access 
+http://192.168.1.201/stats can display relevant statistics. **192.168.1.201 is my host** 
 
-²éÑ¯½á¹ûÖĞÒ»°ãÓĞÈçÏÂ¼¸¸ö×Ö¶Î£º
-* key, request_statsÖĞ¶¨ÒåµÄkey
-* stats_time, Í³¼ÆĞÅÏ¢¿ªÊ¼Ê±¼ä
-* request, ÇëÇó´ÎÊı
-* recv, ½ÓÊÕ×Ö½ÚÊı
-* sent, ·¢ËÍ×Ö½ÚÊı
-* avg_time, ÇëÇóÆ½¾ùÊ±¼ä(ºÁÃë)
-* stats, httpÏìÓ¦Âë, ÆäÖĞ499ÊÇºó¶Ë³¬Ê±ÁË¡£
+Query results typically has the following fields: 
+* key, request_stats defined key 
+* stats_time, statistics Start Time 
+* request, the number of requests 
+* recv, receiving the number of bytes 
+* sent, bytes sent 
+* avg_time, request the average time (in milliseconds) 
+* stats, http response code, where 499 means the backend is timeout. 
 
-&nbsp;&nbsp;**ÒÔÏÂËùÓĞ²éÑ¯½á¹û¶¼ÊÇÔÚÔËĞĞ[¼òµ¥½Å±¾²âÊÔ](#¼òµ¥½Å±¾²âÊÔ)Ò»½ÚÖĞµÄ²âÊÔ½Å±¾ºó²úÉúµÄ¡£**
+&nbsp; &nbsp; ** the following query results are in operation [simple test script] after (# simple script to test) section of the test scripts produced. ** 
 
 #### Text Format
 http://192.168.1.201/stats
@@ -267,9 +268,9 @@ uri:/byuri/10475	2014-08-31 22:16:30	1	169	186	0	 200:1
 ``` 
 #### Html Format
 http://192.168.1.201/stats?fmt=html
-![²éÑ¯½çÃæ](view_html.png)
+![æŸ¥è¯¢ç•Œé¢](view_html.png)
 
-#### Json Format
+#### Json format 
 http://192.168.1.201/stats?fmt=json
 ```json
 {"Optional parameters":{
@@ -296,127 +297,126 @@ http://192.168.1.201/stats?fmt=json
 }
 }
 ```
-#### Query And Clean
-http://192.168.1.201/stats?clean=true
-Ê¹ÓÃclean=true²ÎÊıºó£¬±¾´Î²éÑ¯½á¹ûÒÀÈ»Õı³£ÏÔÊ¾£¬Ö»ÊÇËùÓĞ½á¹ûÏî»á±»ÇåÁã¡£
+#### query and clear
+http://192.168.1.201/stats?clean=true 
+After use clean = true parameter, this query results are still normal, but all result items will be cleared. 
 
 #### Query by status_name
-* http://192.168.1.201/stats?stats_name=statby_headerin
+* http://192.168.1.201/stats?stats_name=statby_headerin 
 
-```text
-key	stats_time	request	recv	sent	avg_time	stat
-header_in:beijing	2014-08-31 22:16:29	20	3740	3580	0	 200:20
-header_in:shengzheng	2014-08-31 22:16:29	20	3800	3660	0	 200:20
-header_in:shanghai	2014-08-31 22:16:29	20	3760	3600	0	 200:20
+```text 
+key stats_time request recv sent avg_time stat 
+header_in: beijing 2014-08-31 22:16:29 20 3740 3580 0 200: 20 
+header_in: shengzheng 2014-08-31 22:16:29 20 3800 3660 0 200: 20 
+header_in: shanghai 2014-08-31 22:16:29 20 3760 3600 0 200: 20 
 ```
-* http://192.168.1.201/stats?stats_name=statby_uri
+* http://192.168.1.201/stats?stats_name=statby_uri 
 
-```text
-key	stats_time	request	recv	sent	avg_time	stat
-uri:/byuri/14858	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/10475	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/20090	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/7054	2014-08-31 22:16:30	1	168	185	0	 200:1
-uri:/byuri/31520	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/22000	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/24415	2014-08-31 22:16:30	1	169	186	0	 200:1
-uri:/byuri/20883	2014-08-31 22:16:30	1	169	186	0	 200:1
+```text 
+key stats_time request recv sent avg_time stat 
+uri: / byuri / 14858 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 10475 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 20090 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 7054 2014-08-31 22:16:30 1 168 185 0 200: 1 
+uri: / byuri / 31520 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 22000 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 24415 2014-08-31 22:16:30 1 169 186 0 200: 1 
+uri: / byuri / 20883 2014-08-31 22:16:30 1 169 186 0 200: 1 
 ```
 
 # Scope
->request_statsÖ¸Áî×÷ÓÃÓòÊÇ:
-`NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF`,Ò²¾ÍÊÇËµrequest_statsÖ¸ÁîÔÚhttp,server,location,ifµÈ½ÚµãÏÂ¶¼¿ÉÒÔ³öÏÖ¡£µ«ÊÇÓÉÓÚ±¾Ä£¿éÊÇÒ»¸öÔÚNGX_HTTP_LOG_PHASE½×¶ÎµÄ²å¼ş£¬Ò»´ÎÇëÇóÖ»»áÓĞÒ»¸öÅäÖÃÏîÊÇÓĞĞ§¡£µ±ÔÚ²»Í¬µÄ²ã´ÎÖĞ³öÏÖÊ±£¬Ö»ÓĞ×îÄÚ²ãµÄ»áÆô×÷ÓÃ¡£µ±È»£¬Èç¹ûÍ¬Ò»²ãÀïÃæÓĞ¶à¸örequest_statsÖ¸Áî£¬¶à¸ö¶¼»áÓĞĞ§¹û¡£±ÈÈç£º
+> request_stats directive scope are: 
+`NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_HTTP_LIF_CONF`, ie request_stats instructions at http, server, location, if peers can occur. However, due to this module is a plug-in NGX_HTTP_LOG_PHASE stage, a request will have a configuration item is valid. When they appear in different levels, only the innermost will start effect. Of course, if there are multiple request_stats instruction with the inside layer, a plurality will have effect. For example: 
 ```
 http {
-    #...
-	request_stats byhost "$host";	
-	server {
-		listen       80;
-		location /login {
-			echo "login";
-		}
-		location /login_new {
-			request_stats byarg "$arg_client_type";		
-			echo "login_new $args";
-		}
-	}
-}
+     # ... 
+request_stats byhost "$host"; 
+server {
+listen 80; 
+location / login {
+echo "login"; 
+} 
+location / login_new {
+request_stats byarg "$arg_client_type"; 
+echo "login_new $args"; 
+} 
+} 
+} 
 ```
-##### Ê¹ÓÃÉÏÃæµÄÅäÖÃ£¬Èç¹û×÷ÈçÏÂÈı´ÎÇëÇó£º
-```shell
-curl http://127.0.0.1:80/login
-curl http://127.0.0.1:80/login_new?client_type=pc
-curl http://127.0.0.1:80/login_new?client_type=android
+##### Using the above configuration, if we make the following three requests: 
+```shell 
+curl http://127.0.0.1:80/login 
+curl http://127.0.0.1:80/login_new?client_type=pc 
+curl http://127.0.0.1:80/login_new?client_type=android 
 ```
-##### Í³¼Æ½á¹û»áÊÇ£º
+##### Statistical results would be: 
 ```
-key         request recv    sent    avg_time
-android     1       187     210     0
-pc          1       182     205     0
-127.0.0.1   1       163     185     0
+key request recv sent avg_time 
+android 1 187 210 0 
+pc 1 182 205 0 
+127.0.0.1 1 163 185 0 
 ```
-/login_newÏÂÃæµÄÇëÇó£¬ÓÉÓÚÒÑ¾­ÓĞÒ»¸öÃûÎªbyargµÄÍ³¼Æ£¬²»»áÖØ¸´Í³¼Æµ½byhostÀïÃæ¡£ÓĞÊ±ºòÕâ¿ÉÄÜ²»ÊÇÄãÏëÒªµÄ½á¹û¡£Èç¹ûÄãÏë/login_newÒ²Í³¼Æ½øbyhostÀïÃæ£¬¿ÉÒÔÔÚ/login_newÏÂÃæÔÙ¼Ó¸örequest_statsÖ¸ÁîºóµÄĞÂµÄÅäÖÃ£º
+/ login_new following request, since there is already a statistic called byarg will not repeat the statistics to byhost inside. Sometimes this may not be the result you want. If you want / login_new also statistics into byhost inside, you can add a request_stats instructions / login_new after the new configuration below: 
 ```
 http {
-    #...
-	request_stats byhost "$host";	
-	server {
-		listen       80;
-		location /login {
-			echo "login";
-		}
-		location /login_new {
-			request_stats byarg "$arg_client_type";
-			request_stats byhost "$host";	
-			echo "login_new $args";
-		}
-	}
-}
+     # ... 
+request_stats byhost "$host"; 
+server {
+listen 80; 
+location / login {
+echo "login"; 
+} 
+location / login_new {
+request_stats byarg "$arg_client_type"; 
+request_stats byhost "$host"; 
+echo "login_new $args"; 
+} 
+} 
+} 
 ```
-##### ÖØĞÂ²âÊÔºó£¬½á¹ûÈçÏÂ£º
+##### After retest results are as follows: 
 ```
-key         request recv    sent    avg_time
-127.0.0.1   3       532     600     0
-android     1       187     210     0
-pc          1       182     205     0
+key request recv sent avg_time 
+127.0.0.1 3 532 600 0 
+android 1 187 210 0 
+pc 1 182 205 0 
 ```
 
 
 
-#### Simple Test
+#### Simple test script
 
-±¾²âÊÔ¶ÔÓ¦ÅäÖÃÔÚSynopsisÒ»½ÚÖĞ¡£
-²âÊÔÒÀÀµÓÚcurlÃüÁî£¬ÇëÈ·ÈÏÄãµÄÏµÍ³ÒÑ¾­°²×°curlÃüÁîĞĞ¡£
-Ô´´úÂëÄ¿Â¼ÏÂµÄ[test.sh](test.sh)
-```bash
-for ((i=0;i<20;i++));do
-curl http://127.0.0.1:81/$RANDOM
-curl http://127.0.0.1:81/404/$RANDOM
-curl http://127.0.0.1:80/byuri/$RANDOM
-curl http://127.0.0.1:80/byarg?client_type=pc
-curl http://127.0.0.1:80/byarg?client_type=ios
-curl http://127.0.0.1:80/byarg?client_type=android
-curl http://127.0.0.1:80/byarg/404?client_type=android
-curl http://127.0.0.1:80/byuriarg?from=partner
-curl http://127.0.0.1:80/byuriarg?from=pc_cli
-curl http://127.0.0.1:80/byuriarg?from=mobile_cli
-curl http://127.0.0.1:80/byhttpheaderin -H"city: shanghai"
-curl http://127.0.0.1:80/byhttpheaderin -H"city: shengzheng"
-curl http://127.0.0.1:80/byhttpheaderin -H"city: beijing"
-curl http://127.0.0.1:80/byhttpheaderout/hit
-curl http://127.0.0.1:80/byhttpheaderout/miss
-done;
+This test corresponds to the configuration in the Synopsis section. 
+Test depends on the curl command, make sure your system has been installed curl command line. 
+[test.sh] (test.sh) source code directory 
+```bash 
+for ((i = 0; i <20; i ++)); do 
+curl http://127.0.0.1:81/$RANDOM 
+curl http://127.0.0.1:81/404/$RANDOM 
+curl http://127.0.0.1:80/byuri/$RANDOM 
+curl http://127.0.0.1:80/byarg?client_type=pc 
+curl http://127.0.0.1:80/byarg?client_type=ios 
+curl http://127.0.0.1:80/byarg?client_type=android 
+curl http://127.0.0.1:80/byarg/404?client_type=android 
+curl http://127.0.0.1:80/byuriarg?from=partner 
+curl http://127.0.0.1:80/byuriarg?from=pc_cli 
+curl http://127.0.0.1:80/byuriarg?from=mobile_cli 
+curl http://127.0.0.1:80/byhttpheaderin -H "city: shanghai" 
+curl http://127.0.0.1:80/byhttpheaderin -H "city: shengzheng" 
+curl http://127.0.0.1:80/byhttpheaderin -H "city: beijing" 
+curl http://127.0.0.1:80/byhttpheaderout/hit 
+curl http://127.0.0.1:80/byhttpheaderout/miss 
+done; 
 
 ```
 
 # See Also
-&nbsp;&nbsp;&nbsp;&nbsp;±¾Ä£¿é°ÑËùÓĞÍ³¼ÆĞÅÏ¢¶¼´æ´¢ÔÚÄÚ´æÖĞ£¬ĞèÒªÓÃ»§×Ô¼º»ñÈ¡Ïà¹ØĞÅÏ¢£¬ÔÙ´æ´¢£¬»ã×Ü¡£×÷ÕßµÄÁíÍâÒ»¸öÏîÄ¿[ngx_req_stat](https://github.com/jie123108/ngx_req_stat)Ò²ÊÇÒ»¸öÇëÇóÍ³¼ÆÄ£¿é£¬µ«Ëü¹¦ÄÜ¸ü¼ÓÇ¿´ó£¬²»¹âkeyÊÇ¿ÉÒÔ×Ô¶¨ÒåµÄ£¬Á¬Í³¼ÆµÄÖµÒ²ÊÇ¿ÉÒÔ×Ô¶¨ÒåµÄ¡£²¢ÇÒÍ³¼ÆĞÅÏ¢´æ´¢ÔÚmongodbÖĞ¡£ÏîÄ¿µØÖ·£º(https://github.com/jie123108/ngx_req_stat)
-
+&nbsp; &nbsp; &nbsp; &nbsp; This module all statistical information is stored in memory, require the user to obtain relevant information, and then store the summary. On another project [ngx_req_stat] (https://github.com/jie123108/ngx_req_stat) is a request for statistics module, but it's more powerful, not only key is customizable, even the statistical value also can be customized . And statistical information stored in mongodb in. Project Address: (https://github.com/jie123108/ngx_req_stat) 
 
 Authors
 =======
 
-* liuxiaojie (ÁõĞ¡½Ü)  <jie123108@163.com>
+* liuxiaojie (åˆ˜å°æ°)  <jie123108@163.com>
 
 [Back to TOC](#table-of-contents)
 
@@ -425,6 +425,6 @@ Copyright & License
 
 This module is licenced under the BSD license.
 
-Copyright (C) 2014, by liuxiaojie (ÁõĞ¡½Ü)  <jie123108@163.com>
+Copyright (C) 2014, by liuxiaojie (åˆ˜å°æ°)  <jie123108@163.com>
 
 All rights reserved.
